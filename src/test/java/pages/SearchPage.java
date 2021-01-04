@@ -7,6 +7,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.How;
 import org.openqa.selenium.support.PageFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchPage {
@@ -22,8 +23,10 @@ public class SearchPage {
     @FindBy(how = How.XPATH, using = "//ul[contains(@class, 'PaginationWrapper')]//li[@title != 'Previous Page' and @title != 'Next Page']")
     private List<WebElement> pagination;
 
-    @FindBy(how = How.XPATH, using = "//ul[@name='itemsGrid']//li")
+    //h4[contains(@class,'PieceTitle')]
+    @FindBy(how = How.XPATH, using = "//ul[@name='itemsGrid']//li//h4[contains(@class,'PieceTitle')]")
     private List<WebElement> products;
+    private List<String> listNameProducts = new ArrayList<String>();
 
     @FindBy(how = How.XPATH, using = "//li[@title='Next Page']")
     private WebElement nextPageButton;
@@ -31,8 +34,8 @@ public class SearchPage {
     @FindBy(how = How.XPATH, using = "//li[@name='totalResult']//span")
     private WebElement totalProducts;
 
-    @FindBy(how = How.XPATH, using = "//ul[@name='itemsGrid']//li//h4[contains(@class, 'PieceTitle')]")
-    private List<WebElement> productNames;
+    @FindBy(how = How.XPATH, using = "//div[@name='breadcrumb']//ul")
+    private WebElement breadcrumb;
 
     private int currentPage = 0;
     private int totalPages = 0;
@@ -53,30 +56,34 @@ public class SearchPage {
         Actions action = new Actions(driver);
         action.moveToElement(brands_filter.get(0)).perform();
         brandSelected = brands_filter.get(0).getText();
+        brandSelected = brandSelected.substring(0, brandSelected.indexOf("(")).trim();
         brands_filter.get(0).click();
     }
 
-    public int getQuantityProducts(){
-        int totalProducts = 0;
-
+    public void getAllProducts(){
         if(pagination.size() == 0){
-            totalProducts = products.size();
+            if(products.size() > 0){
+                for(int p = 0; p < products.size(); p++){
+                    listNameProducts.add(products.get(p).getText());
+                }
+            }// Controlar que si no devuelve resultados blabla...
         }else{
             if(pagination.size() > 0){
-                currentPage = 1;
                 totalPages = pagination.size();
                 for (int i = 0; i < totalPages; i++){
-
-                    totalProducts += products.size();
-                    currentPage++;
-                    if(currentPage <= totalPages) {
-                        nextPageButton.click();
+                    for(int j = 0; j < products.size(); j++){
+                        listNameProducts.add(products.get(j).getText());
+                        if(j == (products.size() - 1) && i < (totalPages - 1)){
+                            nextPageButton.click();
+                        }
                     }
-
                 }
             }
         }
-        return totalProducts;
+    }
+
+    public int getQuantityProducts(){
+        return listNameProducts.size();
     }
 
     public int getTotalProducts(){
@@ -84,29 +91,17 @@ public class SearchPage {
     }
 
     public boolean checkTitles(){
-        if(pagination.size() == 0){
-            for(int i = 0; i < productNames.size(); i++){
-                if(!productNames.get(i).getText().contains(brandSelected)){
-                    return false;
-                }
-            }
-        }else{
-            if(pagination.size() > 0){
-                currentPage = 1;
-                totalPages = pagination.size();
-                for (int i = 0; i < totalPages; i++){
-
-                    if(!productNames.get(i).getText().contains(brandSelected)){
-                        return false;
-                    }
-                    currentPage++;
-                    if(currentPage <= totalPages) {
-                        nextPageButton.click();
-                    }
-
-                }
+        for (String productName : listNameProducts) {
+            if (!productName.contains(brandSelected)) {
+                return false;
             }
         }
         return true;
+    }
+
+    public boolean checkbreadcrum(String word){
+        if(breadcrumb.getText().contains(word))
+            return true;
+        return false;
     }
 }
