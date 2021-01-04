@@ -1,36 +1,31 @@
 package functions;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.openqa.selenium.By;
+import org.junit.After;
+import org.junit.Before;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.util.concurrent.TimeUnit;
 
 public class TestBase {
 
+    private static String DRIVER_PATH = "src/test/resources/drivers/";
     public static WebDriver driver;
 
-    @BeforeEach
-    public void setUp() {
-        System.setProperty("webdriver.chrome.driver","src/test/resources/drivers/chromedriver.exe");
-        driver = new ChromeDriver();
+    @Before
+    public void init(){
+        System.setProperty("webdriver.chrome.driver", DRIVER_PATH+"chromedriver.exe");
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("start-maximized");
+        options.addArguments("--incognito");
+        driver = new ChromeDriver(options);
         driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
     }
 
-    @AfterEach
-    public void tearDown() {
-        driver.quit();
-    }
-
-    public void openUrl(String url){
-        driver.get(url);
-    }
-
-    public WebElement findElement(By element){
-        return driver.findElement(element);
+    @After
+    public void close(){
+        driver.close();
     }
 }
