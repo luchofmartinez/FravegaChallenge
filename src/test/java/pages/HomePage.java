@@ -28,4 +28,5 @@ public class HomePage {
     public void search(){
         search_button.click();
     }
+
 }

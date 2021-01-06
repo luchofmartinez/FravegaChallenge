@@ -1,6 +1,5 @@
 package steps;
 
-import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 import static io.restassured.RestAssured.*;
 
 import io.restassured.RestAssured;
@@ -11,41 +10,46 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.*;
+
 public class BE_API_Test {
 
     @Test
     public void testApi01(){
-        baseURI = "https://api.openbrewerydb.org/breweries";
+
+        baseURI = "https://api.openbrewerydb.org";
 
         RequestSpecification request = RestAssured.given();
 
-        Response response = request.queryParam("query","lagunitas").request(Method.GET, "/autocomplete");
+        Response response =  request.param("query","lagunitas").
+                when().get("/breweries/autocomplete").
+                then().extract().response();
 
         JsonPath jsonPath = response.jsonPath();
 
-        System.out.println(jsonPath.get("id").toString());
+        List<HashMap<String, String>> listBreweries = jsonPath.getList("$.");
 
-    }
 
-    @Test
-    public void testApi02(){
-        baseURI = "https://api.openbrewerydb.org/breweries/761";
+        for(int i=0; i < listBreweries.size(); i++){
+            HashMap<String, String> brewery = listBreweries.get(i);
+            String name = brewery.get("name");
+            String id = brewery.get("id");
 
-        RequestSpecification request = RestAssured.given();
+            if(name.equals("Lagunitas Brewing Co")) {
 
-        Response response = request.queryParams("state", "California").request(Method.GET, "/");
+                baseURI = "https://api.openbrewerydb.org/breweries/" + id;
 
-        JsonPath jsonPath = response.jsonPath();
-        Assert.assertEquals(761, jsonPath.getInt("id"));
-        Assert.assertEquals("Lagunitas Brewing Co", jsonPath.getString("name"));
-        Assert.assertEquals("1280 N McDowell Blvd", jsonPath.getString("street"));
-        Assert.assertEquals("7077694495", jsonPath.getString("phone"));
+                RequestSpecification request01 = RestAssured.given();
+                Response response01 = request01.request(Method.GET, "/");
+                JsonPath jsonPath1 = response01.jsonPath();
+
+                if(jsonPath1.get("state").equals("California")){
+                    Assert.assertEquals(761, jsonPath1.getInt("id"));
+                    Assert.assertEquals("Lagunitas Brewing Co", jsonPath1.getString("name"));
+                    Assert.assertEquals("1280 N McDowell Blvd", jsonPath1.getString("street"));
+                    Assert.assertEquals("7077694495", jsonPath1.getString("phone"));
+                }
+            }
+        }
     }
 }
-
-/*
-"id" = 761
-"name" = "Lagunitas Brewing Co"
-"street" = "1280 N McDowell Blvd"
-"phone" = "7077694495"
-*/

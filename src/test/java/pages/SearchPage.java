@@ -37,6 +37,18 @@ public class SearchPage {
     @FindBy(how = How.XPATH, using = "//div[@name='breadcrumb']//ul")
     private WebElement breadcrumb;
 
+    @FindBy(how = How.XPATH, using = "//p[contains(@class,'TextNotFound')]")
+    private WebElement searchNotFound;
+
+    @FindBy(how = How.XPATH, using = "//h1[@name='categoryTitle']")
+    private WebElement categoryTitle;
+
+    @FindBy(how = How.XPATH, using = "//h4[contains(@class,'PieceTitle')]")
+    private List<WebElement> productTitle;
+
+    @FindBy(how = How.XPATH, using = "//title")
+    private WebElement pageTitle;
+
     private int currentPage = 0;
     private int totalPages = 0;
     private String brandSelected;
@@ -103,5 +115,55 @@ public class SearchPage {
         if(breadcrumb.getText().contains(word))
             return true;
         return false;
+    }
+
+    public String getTitle() {
+        return this.driver.getTitle();
+    }
+
+    public String productsNotFound(){
+        return searchNotFound.getText();
+    }
+
+    public String getCategoryTitle(){
+        return categoryTitle.getText();
+    }
+
+    public boolean titleAndDescriptionChecker(String keyword){
+        int pages = pagination.size();
+        if(pages == 0){
+            int totalProducts = products.size();
+            if(totalProducts > 0){
+                for(int p = 0; p < totalProducts; p++){
+                    WebElement element = productTitle.get(p);
+                    String productName = element.getText().toLowerCase();
+                    if(productName.contains(keyword)){
+                        element.click();
+                        if(pageTitle.getText().toLowerCase().contains(keyword)){
+                            this.driver.navigate().back();
+                        }else{
+                            return false;
+                        }
+                    }else{
+                        return false;
+                    }
+                }
+                return true;
+            }// Controlar que si no devuelve resultados blabla...
+        }else{
+            if(pagination.size() > 0){
+                totalPages = pagination.size();
+                for (int i = 0; i < totalPages; i++){
+                    for(int j = 0; j < products.size(); j++){
+                        listNameProducts.add(products.get(j).getText());
+                        if(j == (products.size() - 1) && i < (totalPages - 1)){
+                            nextPageButton.click();
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+        return true;
     }
 }
