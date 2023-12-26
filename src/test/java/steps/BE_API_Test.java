@@ -29,17 +29,17 @@ public class BE_API_Test {
 
     @Test
     public void testApi02(){
-        baseURI = "https://api.openbrewerydb.org/breweries/761";
+        baseURI = "https://api.openbrewerydb.org/breweries/5ae467af-66dc-4d7f-8839-44228f89b596";
 
         RequestSpecification request = RestAssured.given();
 
         Response response = request.queryParams("state", "California").request(Method.GET, "/");
 
         JsonPath jsonPath = response.jsonPath();
-        Assert.assertEquals(761, jsonPath.getInt("id"));
-        Assert.assertEquals("Lagunitas Brewing Co", jsonPath.getString("name"));
-        Assert.assertEquals("1280 N McDowell Blvd", jsonPath.getString("street"));
-        Assert.assertEquals("7077694495", jsonPath.getString("phone"));
+        Assert.assertEquals("5ae467af-66dc-4d7f-8839-44228f89b596", jsonPath.getString("id"));
+        Assert.assertEquals("101 North Brewing Company", jsonPath.getString("name"));
+        Assert.assertEquals("1304 Scott St Ste D", jsonPath.getString("address_1"));
+        Assert.assertEquals("7077534934", jsonPath.getString("phone"));
     }
 }
 

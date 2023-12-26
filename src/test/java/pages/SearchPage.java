@@ -1,5 +1,6 @@
 package pages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -14,27 +15,27 @@ public class SearchPage {
 
     private WebDriver driver;
 
-    @FindBy(how = How.XPATH, using = "//ul[@name='categoriesAggregation']//li//h4[contains(text(),'Heladeras')]")
+    @FindBy(how = How.XPATH, using = "//li[@data-test-id='sub-category-aggregation']/h4/a[contains(text(),'Heladeras')]")
     private WebElement heladeras_filter;
 
-    @FindBy(how = How.XPATH, using = "//ul[@name='categoriesAggregation']//li[@name='brandsFilter']//li[@name='brandAggregation']")
+    @FindBy(how = How.XPATH, using = "//li[@name='brandAggregation']")
     private List<WebElement> brands_filter;
 
-    @FindBy(how = How.XPATH, using = "//ul[contains(@class, 'PaginationWrapper')]//li[@title != 'Previous Page' and @title != 'Next Page']")
+    @FindBy(how = How.XPATH, using = "//ul/li[@data-type= 'page']")
     private List<WebElement> pagination;
 
     //h4[contains(@class,'PieceTitle')]
-    @FindBy(how = How.XPATH, using = "//ul[@name='itemsGrid']//li//h4[contains(@class,'PieceTitle')]")
+    @FindBy(how = How.XPATH, using = "//ul[@data-test-id='results-list']/li/article/a/a/div/div/span")
     private List<WebElement> products;
     private List<String> listNameProducts = new ArrayList<String>();
 
-    @FindBy(how = How.XPATH, using = "//li[@title='Next Page']")
+    @FindBy(how = How.XPATH, using = "//a[@data-type='next']")
     private WebElement nextPageButton;
 
-    @FindBy(how = How.XPATH, using = "//li[@name='totalResult']//span")
+    @FindBy(how = How.XPATH, using = "//span[@data-test-id='resultsNumber']")
     private WebElement totalProducts;
 
-    @FindBy(how = How.XPATH, using = "//div[@name='breadcrumb']//ul")
+    @FindBy(how = How.XPATH, using = "//ol/li[@itemprop][3]/a/span")
     private WebElement breadcrumb;
 
     private int currentPage = 0;
@@ -44,6 +45,7 @@ public class SearchPage {
     public SearchPage(WebDriver driver){
         this.driver = driver;
         PageFactory.initElements(driver, this);
+        driver.findElement(By.xpath("//button[@data-test-id='close-modal-button']")).click();
     }
 
     public void selectFilterCategory(){
@@ -93,15 +95,18 @@ public class SearchPage {
     public boolean checkTitles(){
         for (String productName : listNameProducts) {
             if (!productName.contains(brandSelected)) {
+                System.out.println(productName);
                 return false;
             }
         }
         return true;
     }
 
-    public boolean checkbreadcrum(String word){
-        if(breadcrumb.getText().contains(word))
+    public boolean checkbreadcrumb(String word){
+        System.out.println(breadcrumb.getText());
+        if(breadcrumb.getText().contains(word)) {
             return true;
+        }
         return false;
     }
 }

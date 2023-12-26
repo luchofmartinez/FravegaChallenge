@@ -1,5 +1,6 @@
 package pages;
 
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -10,10 +11,10 @@ public class HomePage {
 
     private WebDriver driver;
 
-    @FindBy(how= How.XPATH, using = "//input[contains(@class, 'SearchInput')]")
+    @FindBy(how= How.XPATH, using = "//input[@name='keyword' and @placeholder='Buscar productos']")
     private WebElement search_textBox;
 
-    @FindBy(how = How.XPATH, using  = "//button[contains(@class, 'SearchButton')]")
+    @FindBy(how = How.XPATH, using  = "//fieldset//button[@type='submit']")
     private WebElement search_button;
 
     public HomePage(WebDriver driver){
@@ -26,6 +27,6 @@ public class HomePage {
     }
 
     public void search(){
-        search_button.click();
+        search_button.sendKeys(Keys.ENTER);
     }
 }

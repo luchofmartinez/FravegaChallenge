@@ -20,8 +20,12 @@ public class FE_Search_Test extends TestBase {
         searchPage.selectFilterCategory();
         searchPage.selectFilter_brand();
         searchPage.getAllProducts();
-        Assert.assertEquals(searchPage.getTotalProducts(), searchPage.getQuantityProducts());
-        Assert.assertTrue("Error: Uno de los titulos de los productos no contiene la marca seleccionada", searchPage.checkTitles());
-        Assert.assertTrue("Error: El elemento breadcrumb no contiene la palabra '" + WORD + "'",searchPage.checkbreadcrum(WORD));
+        int quantityProducts = searchPage.getQuantityProducts();
+        int totalProductsLabel = searchPage.getTotalProducts();
+        Assert.assertEquals(totalProductsLabel, quantityProducts );
+        boolean isBreadCrumbOk = searchPage.checkbreadcrumb(WORD);
+        Assert.assertTrue("Error: El elemento breadcrumb no contiene la palabra '" + WORD + "'",isBreadCrumbOk);
+        boolean isValid = searchPage.checkTitles();
+        Assert.assertTrue("Error: Uno de los titulos de los productos no contiene la marca seleccionada",isValid);
     }
 }
